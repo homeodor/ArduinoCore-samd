@@ -129,14 +129,18 @@ void loop( void ) ;
 #define ARDUINO_ARCH_SAMD
 #endif
 
-// USB Device
+// USB
+#ifdef USE_TINYUSB
+#include "Adafruit_TinyUSB_Core.h"
+#else
 #include "USB/USBDesc.h"
 #include "USB/USBCore.h"
 #include "USB/USBAPI.h"
 #include "USB/USB_host.h"
-
-#ifdef __cplusplus
-  #include "USB/CDC.h"
 #endif
+
+// #ifdef __cplusplus
+//   #include "USB/CDC.h"
+// #endif
 
 #endif // Arduino_h
