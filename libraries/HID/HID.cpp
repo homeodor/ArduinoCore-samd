@@ -16,6 +16,8 @@
 ** SOFTWARE.  
 */
 
+#ifndef USE_TINYUSB
+
 #include "USB/PluggableUSB.h"
 #include "HID.h"
 
@@ -157,4 +159,5 @@ int HID_::begin(void)
 	return 0;
 }
 
+#endif
 #endif /* if defined(USBCON) */
