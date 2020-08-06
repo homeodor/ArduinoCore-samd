@@ -52,6 +52,8 @@ int main( void )
   for (;;)
   {
     loop();
+    yield(); // yield run usb background task
+
     if (serialEventRun) serialEventRun();
   }
 
