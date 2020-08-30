@@ -31,7 +31,7 @@
 #define VARIANT_MAINOSC (32768ul)
 
 // Master clock frequency
-#define VARIANT_MCK     (48000000ul)
+#define VARIANT_MCK     (F_CPU)
 
 // Pins
 // ----
@@ -54,7 +54,10 @@ extern "C" unsigned int PINCOUNT_fn();
 #define portInputRegister(port)  (&(port->IN.reg))
 #define portModeRegister(port)   (&(port->DIR.reg))
 #define digitalPinHasPWM(P)      (g_APinDescription[P].ulPWMChannel != NOT_ON_PWM || g_APinDescription[P].ulTCChannel != NOT_ON_TIMER)
-#define digitalPinToInterrupt(P) (g_APinDescription[P].ulExtInt)
+
+#if (ARDUINO_SAMD_VARIANT_COMPLIANCE < 10606)
+  #define digitalPinToInterrupt(P) (g_APinDescription[P].ulExtInt)
+#endif
 
 /*
  * digitalPinToTimer(..) is AVR-specific and is not defined for SAMD
@@ -111,11 +114,18 @@ static const uint8_t DAC0 = PIN_DAC0;
 
 #define ADC_RESOLUTION		12
 
+
+// On-board SPI Flash
+#define EXTERNAL_FLASH_DEVICES  GD25Q16C
+#define EXTERNAL_FLASH_USE_SPI  SPI
+#define EXTERNAL_FLASH_USE_CS   SS
+
 /*
  * SPI Interfaces
  */
-#define SPI_INTERFACES_COUNT 1
+#define SPI_INTERFACES_COUNT 3
 
+// SPI interface for QSPI flash
 #define PIN_SPI_MISO         (30u)
 #define PIN_SPI_SCK          (31u)
 #define PIN_SPI_MOSI         (32u)
@@ -128,6 +138,42 @@ static const uint8_t MOSI = PIN_SPI_MOSI ;
 static const uint8_t MISO = PIN_SPI_MISO ;
 static const uint8_t SCK  = PIN_SPI_SCK ;
 
+
+// Extra hardware SPI for Gizmo
+#define PIN_SPI1_SCK          (40u)
+#define PIN_SPI1_MOSI         (39u)
+#define PIN_SPI1_MISO         (41u)
+#define PERIPH_SPI1           sercom5
+#define PAD_SPI1_TX           SPI_PAD_0_SCK_1  // MOSI / SCK
+#define PAD_SPI1_RX           SERCOM_RX_PAD_2  // MISO not avail
+
+static const uint8_t SS1	  = 42 ;
+static const uint8_t MOSI1 = PIN_SPI_MOSI ;
+static const uint8_t MISO1 = PIN_SPI_MISO ;
+static const uint8_t SCK1  = PIN_SPI_SCK ;
+
+
+// Extra hardware for SD card
+#define PIN_SPI2_SCK          (10u)
+#define PIN_SPI2_MOSI         (9u)
+#define PIN_SPI2_MISO         (6u)
+#define PIN_SPI2_SS           (5u)
+#define PERIPH_SPI2           sercom0
+#define PAD_SPI2_TX           SPI_PAD_2_SCK_3  // MOSI / SCK
+#define PAD_SPI2_RX           SERCOM_RX_PAD_1  // MISO not avail
+
+static const uint8_t SS2   = 5 ;
+static const uint8_t MOSI2 = PIN_SPI2_MOSI ;
+static const uint8_t MISO2 = PIN_SPI2_MISO ;
+static const uint8_t SCK2  = PIN_SPI2_SCK ;
+
+
+// Needed for SD library
+#define SDCARD_SPI      SPI2
+#define SDCARD_MISO_PIN PIN_SPI2_MISO
+#define SDCARD_MOSI_PIN PIN_SPI2_MOSI
+#define SDCARD_SCK_PIN  PIN_SPI2_SCK
+#define SDCARD_SS_PIN   PIN_SPI2_SS
 
 /*
  * Wire Interfaces

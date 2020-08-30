@@ -1,3 +1,5 @@
 *.bz2
+*.atsuo
 
 bootloaders/*/build/
+*~
