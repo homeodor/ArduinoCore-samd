@@ -25,8 +25,9 @@
  */
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x00000000+0x2000, LENGTH = 0x00040000-0x2000 /* First 8KB used by bootloader */
-  RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00008000
+  FLASH (rx)  : ORIGIN = 0x00000000+0x2000, LENGTH = 0x00040000-0x2000 /* First 8KB used by bootloader */
+  RAM   (rwx) : ORIGIN = 0x20000000,        LENGTH = 0x00008000-0x8 /* keep the last 4 bytes */
+  MAGIC (rwx) : ORIGIN = 0x20008000-0x8,    LENGTH = 0x4              /* there they are */
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -194,6 +195,13 @@ SECTIONS
 		*(.heap*)
 		__HeapLimit = .;
 	} > RAM
+
+	.noinit (NOLOAD) : 
+	{
+		PROVIDE(__magic_data = .);
+		KEEP(*(.noinit))
+/*		PROVIDE(__stop_noinit_data = .); */
+ 	} > MAGIC
 
 	/* .stack_dummy section doesn't contains any symbols. It is only
 	 * used for linker to calculate size of stack sections, and assign

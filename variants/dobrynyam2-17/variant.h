@@ -80,6 +80,7 @@ extern "C" unsigned int PINCOUNT_fn();
 #define PIN_A4 (19u)
 #define PIN_A5 (20u)
 #define PIN_A6 (21u)
+#define PIN_DAC0 PIN_A0
 static const uint8_t A0  = PIN_A0;
 static const uint8_t A1  = PIN_A1;
 static const uint8_t A2  = PIN_A2;
