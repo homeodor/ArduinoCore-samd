@@ -105,6 +105,8 @@ extern "C" unsigned int PINCOUNT_fn();
 #define PB30	(48u)
 #define PB31	(49u)
 
+#define PIN_DAC0 PA02
+
 /*
  * digitalPinToTimer(..) is AVR-specific and is not defined for SAMD
  * architecture. If you need to check if a pin supports PWM you must

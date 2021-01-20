@@ -98,36 +98,56 @@ void Adafruit_TinyUSB_Core_touch1200(void)
 
 uint8_t Adafruit_USBD_Device::getSerialDescriptor(uint16_t* serial_str)
 {
-  enum { SERIAL_BYTE_LEN = 16 };
+
+  if (_externalSerialNumber)
+  {
+    char* esn = _externalSerialNumber;
+    uint16_t* srsn = serial_str;
+    uint8_t r = 0;
+
+    while (*esn != 0)
+    {
+      *(srsn++) = *(esn++);
+      r++;
+    }
+
+    *srsn = '\0';
+
+    return r;
+
+  } else {
+
+    enum { SERIAL_BYTE_LEN = 16 };
 
 #ifdef __SAMD51__
-  uint32_t* id_addresses[4] = {(uint32_t *) 0x008061FC, (uint32_t *) 0x00806010,
-                               (uint32_t *) 0x00806014, (uint32_t *) 0x00806018};
+    uint32_t* id_addresses[4] = {(uint32_t *) 0x008061FC, (uint32_t *) 0x00806010,
+                                (uint32_t *) 0x00806014, (uint32_t *) 0x00806018};
 #else // samd21
-  uint32_t* id_addresses[4] = {(uint32_t *) 0x0080A00C, (uint32_t *) 0x0080A040,
-                               (uint32_t *) 0x0080A044, (uint32_t *) 0x0080A048};
+    uint32_t* id_addresses[4] = {(uint32_t *) 0x0080A00C, (uint32_t *) 0x0080A040,
+                                (uint32_t *) 0x0080A044, (uint32_t *) 0x0080A048};
 
 #endif
 
-  uint8_t raw_id[SERIAL_BYTE_LEN];
+    uint8_t raw_id[SERIAL_BYTE_LEN];
 
-  for (int i=0; i<4; i++) {
-      for (int k=0; k<4; k++) {
-          raw_id[4 * i + (3 - k)] = (*(id_addresses[i]) >> k * 8) & 0xff;
-      }
-  }
-
-  static const char nibble_to_hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
-  for (unsigned int i = 0; i < sizeof(raw_id); i++) {
-    for (int j = 0; j < 2; j++) {
-      uint8_t nibble = (raw_id[i] >> (j * 4)) & 0xf;
-      // Strings are UTF-16-LE encoded.
-      serial_str[i * 2 + (1 - j)] = nibble_to_hex[nibble];
+    for (int i=0; i<4; i++) {
+        for (int k=0; k<4; k++) {
+            raw_id[4 * i + (3 - k)] = (*(id_addresses[i]) >> k * 8) & 0xff;
+        }
     }
-  }
 
-  return sizeof(raw_id)*2;
+    static const char nibble_to_hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+    for (unsigned int i = 0; i < sizeof(raw_id); i++) {
+      for (int j = 0; j < 2; j++) {
+        uint8_t nibble = (raw_id[i] >> (j * 4)) & 0xf;
+        // Strings are UTF-16-LE encoded.
+        serial_str[i * 2 + (1 - j)] = nibble_to_hex[nibble];
+      }
+    }
+
+    return sizeof(raw_id)*2;
+  }
 }
 
 //--------------------------------------------------------------------+
